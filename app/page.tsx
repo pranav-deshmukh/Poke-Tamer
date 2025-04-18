@@ -1,4 +1,6 @@
 "use client";
+import { createPreloadScene } from "@/scenes/preload-scene";
+import { SCENE_KEYS } from "@/scenes/scene-keys";
 import { useEffect, useRef } from "react";
 
 export default function Home() {
@@ -14,18 +16,19 @@ export default function Home() {
 
       game = new Phaser.Game({
         type: Phaser.CANVAS,
+        pixelArt:false,
         canvas: canvasRef.current,
-        width: 800,
-        height: 600,
-        scene: {
-          preload() {
-            this.load.image("logo", "https://labs.phaser.io/assets/sprites/phaser3-logo.png");
-          },
-          create() {
-            this.add.image(400, 300, "logo");
-          },
+        backgroundColor: "#000000",
+        scale:{
+          width:1024,
+          height:576,
+          mode:Phaser.Scale.FIT,
+          autoCenter:Phaser.Scale.CENTER_BOTH,
         },
       });
+
+      game.scene.add(SCENE_KEYS.PRELOAD_SCENE, createPreloadScene(Phaser));
+      game.scene.start(SCENE_KEYS.PRELOAD_SCENE);
     };
 
     loadPhaser();
@@ -36,8 +39,8 @@ export default function Home() {
   }, []);
 
   return (
-    <div>
-      <canvas ref={canvasRef} />
+    <div className="">
+      <canvas className="" ref={canvasRef} />
     </div>
   );
 }
