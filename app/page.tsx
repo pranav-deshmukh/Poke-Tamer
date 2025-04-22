@@ -1,4 +1,5 @@
 "use client";
+import { createBattleScene } from "@/scenes/battle-scene";
 import { createPreloadScene } from "@/scenes/preload-scene";
 import { SCENE_KEYS } from "@/scenes/scene-keys";
 import { useEffect, useRef } from "react";
@@ -28,6 +29,7 @@ export default function Home() {
       });
 
       game.scene.add(SCENE_KEYS.PRELOAD_SCENE, createPreloadScene(Phaser));
+      game.scene.add(SCENE_KEYS.BATTLE_SCENE, createBattleScene(Phaser));
       game.scene.start(SCENE_KEYS.PRELOAD_SCENE);
     };
 
@@ -40,7 +42,7 @@ export default function Home() {
 
   return (
     <div className="">
-      <canvas className="" ref={canvasRef} />
+      <canvas className="" ref={canvasRef} width={1024} height={576} />
     </div>
   );
 }
