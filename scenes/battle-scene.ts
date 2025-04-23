@@ -3,9 +3,10 @@ import {
   BATTLE_BACKGROUND_ASSET_KEYS,
   HEALTH_BAR_ASSET_KEYS,
   MONSTER_ASSET_KEYS,
-} from "@/assets/asset-keys";
+} from "@/assets/asset-keys/asset-keys";
 import { SCENE_KEYS } from "./scene-keys";
 import { BattleMenu } from "@/battle/ui/menu/battle-menu";
+import { DIRECTION, DIRECTION_TYPE } from "@/common/direction";
 
 
 
@@ -138,6 +139,32 @@ export const createBattleScene = (Phaser: typeof import("phaser")) => {
 
     update(){
         const wasSpaceKeyPresses = Phaser.Input.Keyboard.JustDown(this.cursorKeys?.space);
+        if(wasSpaceKeyPresses){
+            this.battleMenu.handlePlayerInput("OK");
+            return;
+        }
+
+        if(Phaser.Input.Keyboard.JustDown(this.cursorKeys?.shift)){
+            this.battleMenu.handlePlayerInput("CANCEL");
+            return;
+        }
+
+        let selectedDirection:DIRECTION_TYPE = DIRECTION_TYPE.NONE;
+        if(this.cursorKeys.left.isDown){
+            selectedDirection = DIRECTION_TYPE.LEFT;
+        }else if(this.cursorKeys.right.isDown){
+            selectedDirection = DIRECTION_TYPE.RIGHT;
+        }
+        if(this.cursorKeys.up.isDown){
+            selectedDirection = DIRECTION_TYPE.UP;
+        }else if(this.cursorKeys.down.isDown){
+            selectedDirection = DIRECTION_TYPE.DOWN;
+        }
+
+        if(selectedDirection !== DIRECTION_TYPE.NONE){
+            this.battleMenu.handlePlayerInput(selectedDirection);
+            return;
+        }
     }
     createHealthBar(x: number, y: number) {
       const scaleY = 0.7;
