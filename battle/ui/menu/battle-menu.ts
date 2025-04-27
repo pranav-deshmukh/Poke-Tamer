@@ -37,6 +37,15 @@ export class BattleMenu {
   selectedBattleMenuOption: BattleMenuOptionsType;
   selectedAttackMoveOption: AttackMenuOptionsType;
   activeBattleMenu: ActiveBattleMenuType;
+
+  queuedInfoPanelMessages:string[];
+  queuedInfoPanelCallback?:()=>void;
+  waitingForPlayerInput:boolean;
+
+  selectedAttackIndex: number | undefined;
+
+
+
   constructor(scene: Phaser.Scene) {
     this.scene = scene;
     this.createMainInfoPane();
@@ -45,6 +54,17 @@ export class BattleMenu {
     this.selectedBattleMenuOption = BATTLE_MENU_OPTIONS.FIGHT;
     this.selectedAttackMoveOption = ATTACK_MOVE_OPTIONS.MOVE_1;
     this.activeBattleMenu = ACTIVE_BATTLE_MENU.BATTLE_MAIN;
+    this.queuedInfoPanelCallback = undefined;
+    this.queuedInfoPanelMessages = [];
+    this.waitingForPlayerInput = false;
+    this.selectedAttackIndex = undefined;
+  }
+
+  get selectedAttack(){
+    if(this.activeBattleMenu = ACTIVE_BATTLE_MENU.BATTLE_MOVE_SELECT){
+      return this.selectedAttackIndex;
+    }
+    return undefined;
   }
 
   showMainBattleMenu() {
@@ -59,6 +79,7 @@ export class BattleMenu {
       BATTLE_MENU_CURSOR_POSITION.X,
       BATTLE_MENU_CURSOR_POSITION.Y
     );
+    this.selectedAttackIndex = undefined;
   }
 
   hideMainBattleMenu() {
@@ -77,7 +98,11 @@ export class BattleMenu {
   }
 
   handlePlayerInput(input: DIRECTION_TYPE | inputType) {
-    console.log(input);
+    if (this.waitingForPlayerInput && (input==="CANCEL"|| input==="OK")) {
+      this.updateInfoPaneWithMessage();
+      return;
+
+    }
     if (input === "CANCEL") {
       this.switchToMainBattleMenu();
       return;
@@ -88,6 +113,7 @@ export class BattleMenu {
             return;
         }
         if(this.activeBattleMenu === ACTIVE_BATTLE_MENU.BATTLE_MOVE_SELECT){
+          this.handlePlayerChooseArrack();
             return;
         }
       return;
@@ -97,6 +123,31 @@ export class BattleMenu {
     this.moveMainBattleMenuCursor();
     this.updateSelectedMoveMenuOptionsFromInput(input);
     this.moveSelectBattleMenuCursor();
+  }
+
+  updateInfoPaneMessagesAndWaitForInput(messages:string[], callback?:()=>void){
+    this.queuedInfoPanelMessages = messages;
+    this.queuedInfoPanelCallback = callback;
+
+    this.updateInfoPaneWithMessage();
+  }
+  updateInfoPaneWithMessage(){
+    this.waitingForPlayerInput = false;
+    this.battleTextGameObjectLine1.setText('').setAlpha(1);
+
+    //check if al messages are displayed from the queue and then call the callback
+    if(this.queuedInfoPanelMessages.length === 0){
+      if(this.queuedInfoPanelCallback){
+        this.queuedInfoPanelCallback();
+        this.queuedInfoPanelCallback = undefined;
+      }
+      return;
+    }
+
+    //get the first message from the queue and animate it
+    const messageToDisplay = this.queuedInfoPanelMessages.shift()!;
+    this.battleTextGameObjectLine1.setText(messageToDisplay);
+    this.waitingForPlayerInput = true;
   }
 
   createMainBattleMenu() {
@@ -408,16 +459,49 @@ export class BattleMenu {
     }
     if(this.selectedBattleMenuOption===BATTLE_MENU_OPTIONS.ITEM){
         //TODO:
+        this.activeBattleMenu = ACTIVE_BATTLE_MENU.BATTLE_ITEM;
+        this.updateInfoPaneMessagesAndWaitForInput(['Your bag is empty...'], ()=>{
+          this.switchToMainBattleMenu();
+        })
         return;
     }
     if(this.selectedBattleMenuOption===BATTLE_MENU_OPTIONS.SWITCH){
         //TODO:
+        this.activeBattleMenu = ACTIVE_BATTLE_MENU.BATTLE_SWITCH;
+        this.updateInfoPaneMessagesAndWaitForInput(['You have no other monsters in your party...'], ()=>{
+          this.switchToMainBattleMenu();
+        })
         return;
     }
     if(this.selectedBattleMenuOption===BATTLE_MENU_OPTIONS.FLEE){
         //TODO:
+        this.activeBattleMenu = ACTIVE_BATTLE_MENU.BATTLE_FLEE;
+        this.updateInfoPaneMessagesAndWaitForInput(['You failed to run away...'], ()=>{
+          this.switchToMainBattleMenu();
+        })
         return;
     }
     exhaustiveGuard(this.selectedBattleMenuOption)
+  }
+  handlePlayerChooseArrack(){
+    let selectedMoveIndex = 0;
+    switch (this.selectedAttackMoveOption) {
+      case ATTACK_MOVE_OPTIONS.MOVE_1:
+        selectedMoveIndex=0;
+        break;
+      case ATTACK_MOVE_OPTIONS.MOVE_2:
+        selectedMoveIndex=1;
+        break;
+      case ATTACK_MOVE_OPTIONS.MOVE_3:
+        selectedMoveIndex=2;
+        break;
+      case ATTACK_MOVE_OPTIONS.MOVE_4:
+        selectedMoveIndex=3;
+        break;
+    
+      default:
+        exhaustiveGuard(this.selectedAttackMoveOption);
+    }
+    this.selectedAttackIndex = selectedMoveIndex;
   }
 }

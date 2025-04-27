@@ -141,7 +141,16 @@ export const createBattleScene = (Phaser: typeof import("phaser")) => {
         const wasSpaceKeyPresses = Phaser.Input.Keyboard.JustDown(this.cursorKeys?.space);
         if(wasSpaceKeyPresses){
             this.battleMenu.handlePlayerInput("OK");
-            return;
+
+            //check if player selected an attack, and update display text
+            if(this.battleMenu.selectedAttack===undefined){
+              return;
+            }
+            console.log(`Player selected attack: ${this.battleMenu.selectedAttack}`);
+            this.battleMenu.hideMonsterAttackSubMenu();
+            this.battleMenu.updateInfoPaneMessagesAndWaitForInput(['Your monster attacks the enemy'], ()=>{
+              this.battleMenu.showMainBattleMenu();
+            })
         }
 
         if(Phaser.Input.Keyboard.JustDown(this.cursorKeys?.shift)){
