@@ -7,6 +7,7 @@ import {
 import { SCENE_KEYS } from "./scene-keys";
 import { BattleMenu } from "@/battle/ui/menu/battle-menu";
 import { DIRECTION, DIRECTION_TYPE } from "@/common/direction";
+import { Background } from "@/battle/background";
 
 
 
@@ -62,7 +63,9 @@ export const createBattleScene = (Phaser: typeof import("phaser")) => {
     create() {
       console.log(`[${BattleScene.name}] Preload complete`);
       //main background
-      this.add.image(0, 0, BATTLE_BACKGROUND_ASSET_KEYS.FOREST).setOrigin(0);
+      const background = new Background(this);
+      background.showForest();
+      
 
       //render player and enemy
       this.add.image(768, 144, MONSTER_ASSET_KEYS.CARNODUSK, 0);
