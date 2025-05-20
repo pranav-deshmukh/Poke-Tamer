@@ -8,6 +8,7 @@ import { SCENE_KEYS } from "./scene-keys";
 import { BattleMenu } from "@/battle/ui/menu/battle-menu";
 import { DIRECTION, DIRECTION_TYPE } from "@/common/direction";
 import { Background } from "@/battle/background";
+import { HealthBar } from "@/battle/ui/healthbar";
 
 
 
@@ -88,7 +89,7 @@ export const createBattleScene = (Phaser: typeof import("phaser")) => {
           .image(0, 0, BATTLE_ASSET_KEYS.HEALTH_BAR_BACKGROUND)
           .setOrigin(0),
         playerMonsterName,
-        this.createHealthBar(34, 34),
+        new HealthBar(this, 34, 34).Container,
         this.add.text(playerMonsterName.width + 35, 23, "L1", {
           color: "#ED474B",
           fontSize: "28px",
@@ -121,7 +122,7 @@ export const createBattleScene = (Phaser: typeof import("phaser")) => {
           .setOrigin(0)
           .setScale(1, 0.8),
         enemyMonsterName,
-        this.createHealthBar(34, 34),
+        new HealthBar(this, 34, 34).Container,
         this.add.text(enemyMonsterName.width + 35, 23, "L1", {
           color: "#ED474B",
           fontSize: "28px",
@@ -178,27 +179,7 @@ export const createBattleScene = (Phaser: typeof import("phaser")) => {
             return;
         }
     }
-    createHealthBar(x: number, y: number) {
-      const scaleY = 0.7;
-      const leftCap = this.add
-        .image(x, y, HEALTH_BAR_ASSET_KEYS.LEFT_CAP)
-        .setOrigin(0, 0.5)
-        .setScale(1, scaleY);
-      const middle = this.add
-        .image(leftCap.x + leftCap.width, y, HEALTH_BAR_ASSET_KEYS.MIDDLE)
-        .setOrigin(0, 0.5)
-        .setScale(1, scaleY);
-      middle.displayWidth = 360;
-      const rightCap = this.add
-        .image(
-          middle.x + middle.displayWidth,
-          y,
-          HEALTH_BAR_ASSET_KEYS.RIGHT_CAP
-        )
-        .setOrigin(0, 0.5)
-        .setScale(1, scaleY);
-      return this.add.container(x, y, [leftCap, middle, rightCap]);
-    }
+    
 
     
   };
