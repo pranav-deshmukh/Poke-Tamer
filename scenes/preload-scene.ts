@@ -22,6 +22,9 @@ export const createPreloadScene = (Phaser: typeof import("phaser")) => {
       this.load.image(HEALTH_BAR_ASSET_KEYS.LEFT_CAP, `${kenneysAssetsPath}/ui-space-expansion/barHorizontal_green_left.png`)
       this.load.image(HEALTH_BAR_ASSET_KEYS.MIDDLE, `${kenneysAssetsPath}/ui-space-expansion/barHorizontal_green_mid.png`)
       this.load.image(HEALTH_BAR_ASSET_KEYS.RIGHT_CAP, `${kenneysAssetsPath}/ui-space-expansion/barHorizontal_green_right.png`)
+      this.load.image(HEALTH_BAR_ASSET_KEYS.LEFT_CAP_SHADOW, `${kenneysAssetsPath}/ui-space-expansion/barHorizontal_shadow_left.png`)
+      this.load.image(HEALTH_BAR_ASSET_KEYS.MIDDLE_SHADOW, `${kenneysAssetsPath}/ui-space-expansion/barHorizontal_shadow_mid.png`)
+      this.load.image(HEALTH_BAR_ASSET_KEYS.RIGHT_CAP_SHADOW, `${kenneysAssetsPath}/ui-space-expansion/barHorizontal_shadow_right.png`)
 
       //monsters assets
       this.load.image(MONSTER_ASSET_KEYS.CARNODUSK, `${monsterTamerAssetsPath}/monsters/carnodusk.png`)

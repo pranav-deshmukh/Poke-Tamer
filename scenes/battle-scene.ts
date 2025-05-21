@@ -75,6 +75,7 @@ export const createBattleScene = (Phaser: typeof import("phaser")) => {
         .setFlipX(true);
 
       //render player health bar
+      const playerHealthBar = new HealthBar(this, 34, 34);
       const playerMonsterName = this.add.text(
         30,
         20,
@@ -89,7 +90,7 @@ export const createBattleScene = (Phaser: typeof import("phaser")) => {
           .image(0, 0, BATTLE_ASSET_KEYS.HEALTH_BAR_BACKGROUND)
           .setOrigin(0),
         playerMonsterName,
-        new HealthBar(this, 34, 34).Container,
+        playerHealthBar.Container,
         this.add.text(playerMonsterName.width + 35, 23, "L1", {
           color: "#ED474B",
           fontSize: "28px",
@@ -106,7 +107,7 @@ export const createBattleScene = (Phaser: typeof import("phaser")) => {
           })
           .setOrigin(1, 0),
       ]);
-
+      const enemyHealthBar = new HealthBar(this, 34, 34);
       const enemyMonsterName = this.add.text(
         30,
         20,
@@ -122,7 +123,7 @@ export const createBattleScene = (Phaser: typeof import("phaser")) => {
           .setOrigin(0)
           .setScale(1, 0.8),
         enemyMonsterName,
-        new HealthBar(this, 34, 34).Container,
+        enemyHealthBar.Container,
         this.add.text(enemyMonsterName.width + 35, 23, "L1", {
           color: "#ED474B",
           fontSize: "28px",
@@ -138,7 +139,12 @@ export const createBattleScene = (Phaser: typeof import("phaser")) => {
       this.battleMenu = new BattleMenu(this);
       this.battleMenu.showMainBattleMenu();
       this.cursorKeys = this.input.keyboard?.createCursorKeys();
-      
+      playerHealthBar.setMeterPercentageAnimated(0.5, {
+        duration: 4000,
+        callback:()=>{
+          console.log("Player health bar animation complete");
+        }
+      });
     }
 
     update(){
