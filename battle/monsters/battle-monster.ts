@@ -30,7 +30,7 @@ export class BattleMonster {
       this._monsterDetails.assetKey,
       this._monsterDetails.assetFrame || 0
     );
-    this.createHealthBarComponents();
+    this.createHealthBarComponents(config.scaleHealthBarBackgroundImageByY);
   }
 
   get isFainted(): boolean {
@@ -48,6 +48,10 @@ export class BattleMonster {
     return this._monsterDetails.baseAttack;
   }
 
+  get level():number{
+    return this._monsterDetails.currentLevel;
+  }
+
   takeDamage(damage: number, callback?: () => void) {
     //update current monster health and animate healthbar
     this._currentHealth -= damage;
@@ -60,7 +64,7 @@ export class BattleMonster {
     );
   }
 
-  createHealthBarComponents() {
+  createHealthBarComponents(scaleHealthBarBackgroundImageByY:number = 1) {
     this._healthBar = new HealthBar(this._scene, 34, 34);
 
     const monsterNameGameText = this._scene.add.text(
@@ -76,9 +80,9 @@ export class BattleMonster {
     const healthBarBackgroundImage = this._scene.add
     .image(0, 0, BATTLE_ASSET_KEYS.HEALTH_BAR_BACKGROUND)
     .setOrigin(0)
-    .setScale(1, 0.8);
+    .setScale(1, scaleHealthBarBackgroundImageByY);
 
-    const monsterHealthBarLevelText = this._scene.add.text(monsterNameGameText.width + 35, 23, "L1", {
+    const monsterHealthBarLevelText = this._scene.add.text(monsterNameGameText.width + 35, 23, `L${this.level}`, {
       color: "#ED474B",
       fontSize: "28px",
     });

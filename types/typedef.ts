@@ -2,6 +2,7 @@ export interface Monster {
   name: string;
   assetKey: string;
   assetFrame?: number;
+  currentLevel: number;
   maxHp: number;
   currentHp: number;
   baseAttack: number;
@@ -11,6 +12,7 @@ export interface Monster {
 export interface BattleMonsterConfig {
   scene: Phaser.Scene;
   monsterDetails: Monster;
+  scaleHealthBarBackgroundImageByY:number;
 }
 
 export interface Coordinate {
@@ -22,5 +24,5 @@ export interface Attack{
     id:number;
     name:string;
     animationName:string;
-
 }
+

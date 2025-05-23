@@ -7,6 +7,6 @@ const ENEMY_POSITION:Coordinate = Object.freeze({
 })
 export class EnemyBattleMonster extends BattleMonster {
     constructor(config:BattleMonsterConfig){
-        super(config, ENEMY_POSITION);
+        super({...config, scaleHealthBarBackgroundImageByY:0.8}, ENEMY_POSITION);
     }
 }

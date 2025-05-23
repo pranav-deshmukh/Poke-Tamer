@@ -81,6 +81,7 @@ export const createBattleScene = (Phaser: typeof import("phaser")) => {
             maxHp: 25,
             attackIds: [],
             baseAttack: 5,
+            currentLevel: 1,
           },
         },
       );
@@ -123,35 +124,7 @@ export const createBattleScene = (Phaser: typeof import("phaser")) => {
           .setOrigin(1, 0),
       ]);
 
-      //render enemy health bar
-      const enemyHealthBar = this.activeEnemyMonster._healthBar;
-      const enemyMonsterName = this.add.text(
-        30,
-        20,
-        MONSTER_ASSET_KEYS.CARNODUSK,
-        {
-          color: "#7E3D3F",
-          fontSize: "32px",
-        }
-      );
-      this.add.container(0, 0, [
-        this.add
-          .image(0, 0, BATTLE_ASSET_KEYS.HEALTH_BAR_BACKGROUND)
-          .setOrigin(0)
-          .setScale(1, 0.8),
-        enemyMonsterName,
-        enemyHealthBar.Container,
-        this.add.text(enemyMonsterName.width + 35, 23, "L1", {
-          color: "#ED474B",
-          fontSize: "28px",
-        }),
-        this.add.text(30, 55, "HP", {
-          color: "#FF6505",
-          fontSize: "24px",
-          fontStyle: "italic",
-        }),
 
-      ]);
       //render main and sub indo panes
       this.battleMenu = new BattleMenu(this);
       this.battleMenu.showMainBattleMenu();
