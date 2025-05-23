@@ -6,16 +6,18 @@ import {
 } from "@/assets/asset-keys/asset-keys";
 import { SCENE_KEYS } from "./scene-keys";
 import { BattleMenu } from "@/battle/ui/menu/battle-menu";
-import { DIRECTION, DIRECTION_TYPE } from "@/common/direction";
+import { DIRECTION_TYPE } from "@/common/direction";
 import { Background } from "@/battle/background";
 import { HealthBar } from "@/battle/ui/healthbar";
-
-
+import { EnemyBattleMonster } from "@/battle/monsters/enemy-battle-monster";
 
 export const createBattleScene = (Phaser: typeof import("phaser")) => {
   return class BattleScene extends Phaser.Scene {
-    battleMenu:BattleMenu;
-    cursorKeys:Phaser.Types.Input.Keyboard.CursorKeys;
+    battleMenu: BattleMenu;
+    cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys;
+    activeEnemyMonster: EnemyBattleMonster;
+
+
     constructor() {
       super({ key: SCENE_KEYS.BATTLE_SCENE });
     }
@@ -66,10 +68,23 @@ export const createBattleScene = (Phaser: typeof import("phaser")) => {
       //main background
       const background = new Background(this);
       background.showForest();
-      
 
       //render player and enemy
-      this.add.image(768, 144, MONSTER_ASSET_KEYS.CARNODUSK, 0);
+      this.activeEnemyMonster = new EnemyBattleMonster(
+        {
+          scene: this,
+          monsterDetails: {
+            name: MONSTER_ASSET_KEYS.CARNODUSK,
+            assetKey: MONSTER_ASSET_KEYS.CARNODUSK,
+            assetFrame: 0,
+            currentHp: 25,
+            maxHp: 25,
+            attackIds: [],
+            baseAttack: 5,
+          },
+        },
+      );
+      // this.add.image(768, 144, MONSTER_ASSET_KEYS.CARNODUSK, 0);
       this.add
         .image(256, 316, MONSTER_ASSET_KEYS.IGUANIGNITE, 0)
         .setFlipX(true);
@@ -107,7 +122,9 @@ export const createBattleScene = (Phaser: typeof import("phaser")) => {
           })
           .setOrigin(1, 0),
       ]);
-      const enemyHealthBar = new HealthBar(this, 34, 34);
+
+      //render enemy health bar
+      const enemyHealthBar = this.activeEnemyMonster._healthBar;
       const enemyMonsterName = this.add.text(
         30,
         20,
@@ -134,59 +151,66 @@ export const createBattleScene = (Phaser: typeof import("phaser")) => {
           fontStyle: "italic",
         }),
 
-        //render main and sub indo panes
       ]);
+      //render main and sub indo panes
       this.battleMenu = new BattleMenu(this);
       this.battleMenu.showMainBattleMenu();
+
+
       this.cursorKeys = this.input.keyboard?.createCursorKeys();
       playerHealthBar.setMeterPercentageAnimated(0.5, {
         duration: 4000,
-        callback:()=>{
+        callback: () => {
           console.log("Player health bar animation complete");
-        }
+        },
       });
+      this.activeEnemyMonster.takeDamage(15)
     }
 
-    update(){
-        const wasSpaceKeyPresses = Phaser.Input.Keyboard.JustDown(this.cursorKeys?.space);
-        if(wasSpaceKeyPresses){
-            this.battleMenu.handlePlayerInput("OK");
+    update() {
+      const wasSpaceKeyPresses = Phaser.Input.Keyboard.JustDown(
+        this.cursorKeys?.space
+      );
+      if (wasSpaceKeyPresses) {
+        this.battleMenu.handlePlayerInput("OK");
 
-            //check if player selected an attack, and update display text
-            if(this.battleMenu.selectedAttack===undefined){
-              return;
-            }
-            console.log(`Player selected attack: ${this.battleMenu.selectedAttack}`);
-            this.battleMenu.hideMonsterAttackSubMenu();
-            this.battleMenu.updateInfoPaneMessagesAndWaitForInput(['Your monster attacks the enemy'], ()=>{
-              this.battleMenu.showMainBattleMenu();
-            })
+        //check if player selected an attack, and update display text
+        if (this.battleMenu.selectedAttack === undefined) {
+          return;
         }
+        console.log(
+          `Player selected attack: ${this.battleMenu.selectedAttack}`
+        );
+        this.battleMenu.hideMonsterAttackSubMenu();
+        this.battleMenu.updateInfoPaneMessagesAndWaitForInput(
+          ["Your monster attacks the enemy"],
+          () => {
+            this.battleMenu.showMainBattleMenu();
+          }
+        );
+      }
 
-        if(Phaser.Input.Keyboard.JustDown(this.cursorKeys?.shift)){
-            this.battleMenu.handlePlayerInput("CANCEL");
-            return;
-        }
+      if (Phaser.Input.Keyboard.JustDown(this.cursorKeys?.shift)) {
+        this.battleMenu.handlePlayerInput("CANCEL");
+        return;
+      }
 
-        let selectedDirection:DIRECTION_TYPE = DIRECTION_TYPE.NONE;
-        if(this.cursorKeys.left.isDown){
-            selectedDirection = DIRECTION_TYPE.LEFT;
-        }else if(this.cursorKeys.right.isDown){
-            selectedDirection = DIRECTION_TYPE.RIGHT;
-        }
-        if(this.cursorKeys.up.isDown){
-            selectedDirection = DIRECTION_TYPE.UP;
-        }else if(this.cursorKeys.down.isDown){
-            selectedDirection = DIRECTION_TYPE.DOWN;
-        }
+      let selectedDirection: DIRECTION_TYPE = DIRECTION_TYPE.NONE;
+      if (this.cursorKeys.left.isDown) {
+        selectedDirection = DIRECTION_TYPE.LEFT;
+      } else if (this.cursorKeys.right.isDown) {
+        selectedDirection = DIRECTION_TYPE.RIGHT;
+      }
+      if (this.cursorKeys.up.isDown) {
+        selectedDirection = DIRECTION_TYPE.UP;
+      } else if (this.cursorKeys.down.isDown) {
+        selectedDirection = DIRECTION_TYPE.DOWN;
+      }
 
-        if(selectedDirection !== DIRECTION_TYPE.NONE){
-            this.battleMenu.handlePlayerInput(selectedDirection);
-            return;
-        }
+      if (selectedDirection !== DIRECTION_TYPE.NONE) {
+        this.battleMenu.handlePlayerInput(selectedDirection);
+        return;
+      }
     }
-    
-
-    
   };
 };
