@@ -18,9 +18,14 @@ export const createBattleScene = (Phaser: typeof import("phaser")) => {
     cursorKeys: Phaser.Types.Input.Keyboard.CursorKeys;
     activeEnemyMonster: EnemyBattleMonster;
     activePlayerMonster: PlayerBattleMonster;
+    activePlayerAttackIndex: number;
 
     constructor() {
       super({ key: SCENE_KEYS.BATTLE_SCENE });
+    }
+
+    init(){
+      this.activePlayerAttackIndex = -1;
     }
 
     preload() {
@@ -79,7 +84,7 @@ export const createBattleScene = (Phaser: typeof import("phaser")) => {
           assetFrame: 0,
           currentHp: 25,
           maxHp: 25,
-          attackIds: [],
+          attackIds: [1],
           baseAttack: 5,
           currentLevel: 1,
         },
@@ -93,21 +98,18 @@ export const createBattleScene = (Phaser: typeof import("phaser")) => {
           assetFrame: 0,
           currentHp: 25,
           maxHp: 25,
-          attackIds: [],
+          attackIds: [2],
           baseAttack: 5,
           currentLevel: 1,
         },
       });
 
-      //render main and sub indo panes
-      this.battleMenu = new BattleMenu(this);
+      //render main and sub info panes
+      this.battleMenu = new BattleMenu(this, this.activePlayerMonster);
       this.battleMenu.showMainBattleMenu();
 
       this.cursorKeys = this.input.keyboard?.createCursorKeys();
 
-      this.activeEnemyMonster.takeDamage(20, () => {
-        this.activePlayerMonster.takeDamage(15);
-      });
     }
 
     update() {
@@ -121,16 +123,19 @@ export const createBattleScene = (Phaser: typeof import("phaser")) => {
         if (this.battleMenu.selectedAttack === undefined) {
           return;
         }
+        
+        this.activePlayerAttackIndex = this.battleMenu.selectedAttack;
+
+        if(!this.activePlayerMonster.attacks[this.activePlayerAttackIndex]){
+          return;
+        }
+
         console.log(
           `Player selected attack: ${this.battleMenu.selectedAttack}`
         );
+
         this.battleMenu.hideMonsterAttackSubMenu();
-        this.battleMenu.updateInfoPaneMessagesAndWaitForInput(
-          ["Your monster attacks the enemy"],
-          () => {
-            this.battleMenu.showMainBattleMenu();
-          }
-        );
+        this.handleBattleSequence();
       }
 
       if (Phaser.Input.Keyboard.JustDown(this.cursorKeys?.shift)) {
@@ -154,6 +159,33 @@ export const createBattleScene = (Phaser: typeof import("phaser")) => {
         this.battleMenu.handlePlayerInput(selectedDirection);
         return;
       }
+    }
+    handleBattleSequence(){
+      //general battle flowt
+      //show attack used, brief pause
+      //then play attack animation, brief pause
+      //then show damage taken, brief pause
+      //then show monster health bar, brief pause
+      //then repeat above steps fro enemy monster
+      this.playerAttack();
+    }
+    playerAttack(){
+      this.battleMenu.updateInfoPaneMessagesAndWaitForInput([`${this.activePlayerMonster.name} used ${this.activePlayerMonster.attacks[this.activePlayerAttackIndex].name}`],()=>{
+        this.time.delayedCall(500, ()=>{
+          this.activeEnemyMonster.takeDamage(20, ()=>{
+            this.enemyAttack();
+          })
+        })
+      })
+    }
+    enemyAttack(){
+      this.battleMenu.updateInfoPaneMessagesAndWaitForInput([`for ${this.activeEnemyMonster.name} used ${this.activeEnemyMonster.attacks[0].name}`],()=>{
+        this.time.delayedCall(500, ()=>{
+          this.activePlayerMonster.takeDamage(20, ()=>{
+            this.battleMenu.showMainBattleMenu();
+          })
+        })
+      })
     }
   };
 };

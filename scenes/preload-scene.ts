@@ -1,4 +1,4 @@
-import { BATTLE_ASSET_KEYS, BATTLE_BACKGROUND_ASSET_KEYS, HEALTH_BAR_ASSET_KEYS, MONSTER_ASSET_KEYS, UI_ASSET_KEYS } from "@/assets/asset-keys/asset-keys";
+import { BATTLE_ASSET_KEYS, BATTLE_BACKGROUND_ASSET_KEYS, DATA_ASSET_KEYS, HEALTH_BAR_ASSET_KEYS, MONSTER_ASSET_KEYS, UI_ASSET_KEYS } from "@/assets/asset-keys/asset-keys";
 import { SCENE_KEYS } from "./scene-keys";
 
 export const createPreloadScene = (Phaser: typeof import("phaser")) => {
@@ -32,6 +32,9 @@ export const createPreloadScene = (Phaser: typeof import("phaser")) => {
 
       //ui assets
       this.load.image(UI_ASSET_KEYS.CURSOR, `${monsterTamerAssetsPath}/ui/cursor.png`)
+
+      //load json data
+      this.load.json(DATA_ASSET_KEYS.ATTACKS, '/assets/data/attacks.json')
     }
 
     create() {
