@@ -1,4 +1,4 @@
-import { BATTLE_ASSET_KEYS, DATA_ASSET_KEYS } from "@/assets/asset-keys/asset-keys";
+import { BATTLE_ASSET_KEYS } from "@/assets/asset-keys/asset-keys";
 import { HealthBar } from "../ui/healthbar";
 import {
   Attack,
@@ -6,6 +6,7 @@ import {
   Coordinate,
   Monster,
 } from "@/types/typedef";
+import { DataUtils } from "@/utils/data-utils";
 
 export class BattleMonster {
   protected _scene: Phaser.Scene;
@@ -32,10 +33,9 @@ export class BattleMonster {
     );
     this.createHealthBarComponents(config.scaleHealthBarBackgroundImageByY);
 
-    const data:Attack[] = this._scene.cache.json.get(DATA_ASSET_KEYS.ATTACKS)
 
     this._monsterDetails.attackIds.forEach((attackId)=>{
-      const monsterAttack = data.find((attack)=>attack.id === attackId);
+      const monsterAttack = DataUtils.getMonsterAttack(this._scene, attackId);
       if(monsterAttack!=undefined){
         this._monsterAttacks.push(monsterAttack);
       }

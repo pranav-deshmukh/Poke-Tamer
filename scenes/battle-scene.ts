@@ -85,7 +85,7 @@ export const createBattleScene = (Phaser: typeof import("phaser")) => {
           currentHp: 25,
           maxHp: 25,
           attackIds: [1],
-          baseAttack: 5,
+          baseAttack: 25,
           currentLevel: 1,
         },
       });
@@ -109,7 +109,6 @@ export const createBattleScene = (Phaser: typeof import("phaser")) => {
       this.battleMenu.showMainBattleMenu();
 
       this.cursorKeys = this.input.keyboard?.createCursorKeys();
-
     }
 
     update() {
@@ -172,19 +171,49 @@ export const createBattleScene = (Phaser: typeof import("phaser")) => {
     playerAttack(){
       this.battleMenu.updateInfoPaneMessagesAndWaitForInput([`${this.activePlayerMonster.name} used ${this.activePlayerMonster.attacks[this.activePlayerAttackIndex].name}`],()=>{
         this.time.delayedCall(500, ()=>{
-          this.activeEnemyMonster.takeDamage(20, ()=>{
+          this.activeEnemyMonster.takeDamage(this.activePlayerMonster.baseAttack, ()=>{
             this.enemyAttack();
           })
         })
       })
     }
     enemyAttack(){
+      if(this.activeEnemyMonster.isFainted){
+        this.postBattleSequenceCheck();
+        return;
+      }
       this.battleMenu.updateInfoPaneMessagesAndWaitForInput([`for ${this.activeEnemyMonster.name} used ${this.activeEnemyMonster.attacks[0].name}`],()=>{
         this.time.delayedCall(500, ()=>{
-          this.activePlayerMonster.takeDamage(20, ()=>{
-            this.battleMenu.showMainBattleMenu();
+          this.activePlayerMonster.takeDamage(this.activeEnemyMonster.baseAttack, ()=>{
+            this.postBattleSequenceCheck();
           })
         })
+      })
+    }
+
+    postBattleSequenceCheck(){
+      if(this.activeEnemyMonster.isFainted){
+        this.battleMenu.updateInfoPaneMessagesAndWaitForInput([`WIld ${this.activeEnemyMonster.name} fainted`,`You have gained some experience`],
+        ()=>{
+          this.transitionToNextScene();
+        });
+        return;
+      }
+
+      if(this.activePlayerMonster.isFainted){
+        this.battleMenu.updateInfoPaneMessagesAndWaitForInput([`WIld ${this.activePlayerMonster.name} fainted`,`You have no more monsters, escaping to safety...`],
+        ()=>{
+          this.transitionToNextScene();
+        });
+        return;
+      }
+      this.battleMenu.showMainBattleMenu();
+    }
+
+    transitionToNextScene(){
+      this.cameras.main.fadeOut(600, 0, 0, 0);
+      this.cameras.main.once(Phaser.Cameras.Scene2D.Events.FADE_OUT_COMPLETE, ()=>{
+        this.scene.start(SCENE_KEYS.BATTLE_SCENE);
       })
     }
   };
